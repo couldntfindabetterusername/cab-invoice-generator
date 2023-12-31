@@ -1,9 +1,26 @@
 package com.example;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+
 public class CabInvoiceGenerator {
     static final double COST_PER_MINUTE = 1.0;
     static final double COST_PER_KM = 10.0;
     static final double MINIMUM_FARE = 5.0;
+
+    private Map<String, ArrayList<Ride>> ridesRepo;
+
+    public CabInvoiceGenerator() {
+        ridesRepo = new HashMap<>();
+    }
+
+    public void addRide(String key, Ride ride) {
+        if (!ridesRepo.containsKey(key)) {
+            ridesRepo.put(key, new ArrayList<Ride>());
+        }
+        ridesRepo.get(key).add(ride);
+    }
 
     public double calculateFare(double distance, double time) {
         double totalFare = distance * COST_PER_KM + time * COST_PER_MINUTE;
@@ -20,6 +37,23 @@ public class CabInvoiceGenerator {
 
     public InvoiceReport getInvoiceReport(Ride[] rides) {
         int totalRides = rides.length;
+
+        double totalFare = 0.0;
+        for (Ride ride : rides) {
+            totalFare += calculateFare(ride.distance, ride.time);
+        }
+
+        return new InvoiceReport(totalRides, totalFare);
+    }
+
+    public InvoiceReport getInvoiceReport(String userID) {
+        if (!ridesRepo.containsKey(userID)) {
+            return new InvoiceReport(0, 0);
+        }
+
+        ArrayList<Ride> rides = ridesRepo.get(userID);
+
+        int totalRides = rides.size();
 
         double totalFare = 0.0;
         for (Ride ride : rides) {

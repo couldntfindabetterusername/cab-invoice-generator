@@ -6,8 +6,11 @@ public class InvoiceReport {
     public double averageFare;
 
     public InvoiceReport(int ridesCount, double totalFare) {
-        this.ridesCount = ridesCount;
+        this.ridesCount = ridesCount; 
         this.totalFare = totalFare;
-        this.averageFare = totalFare / ridesCount;
+        if (ridesCount != 0)
+            this.averageFare = totalFare / ridesCount;
+        else
+            this.averageFare = 0.0;
     }
 }

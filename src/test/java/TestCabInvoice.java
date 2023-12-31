@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.example.CabInvoiceGenerator;
+import com.example.InvoiceReport;
 import com.example.Ride;
 
 public class TestCabInvoice {
@@ -30,5 +31,21 @@ public class TestCabInvoice {
     public void testAggregateFare() {
         double fare = cabInvoiceGenerator.aggregateFare(new Ride[] { new Ride(5, 15), new Ride(10, 30) });
         assertEquals(195.0, fare);
+    }
+
+    @Test
+    public void testAverageFare() {
+        Ride[] rides = {
+                new Ride(2.0, 5),
+                new Ride(1.0, 1),
+                new Ride(1.0, 2),
+        };
+
+        InvoiceReport report = cabInvoiceGenerator.getInvoiceReport(rides);
+        InvoiceReport expectedReport = new InvoiceReport(3, 48);
+
+        assertEquals(expectedReport.ridesCount, report.ridesCount);
+        assertEquals(expectedReport.totalFare, report.totalFare);
+        assertEquals(expectedReport.averageFare, report.averageFare);
     }
 }

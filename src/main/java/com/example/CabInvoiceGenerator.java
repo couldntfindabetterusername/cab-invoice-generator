@@ -5,9 +5,13 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 public class CabInvoiceGenerator {
-    static final double COST_PER_MINUTE = 1.0;
-    static final double COST_PER_KM = 10.0;
-    static final double MINIMUM_FARE = 5.0;
+    static final double NORMAL_COST_PER_MINUTE = 1.0;
+    static final double NORMAL_COST_PER_KM = 10.0;
+    static final double NORMAL_MINIMUM_FARE = 5.0;
+
+    static final double PREMIUM_COST_PER_MINUTE = 2.0;
+    static final double PREMIUM_COST_PER_KM = 15.0;
+    static final double PREMIUM_MINIMUM_FARE = 20.0;
 
     private Map<String, ArrayList<Ride>> ridesRepo;
 
@@ -22,15 +26,23 @@ public class CabInvoiceGenerator {
         ridesRepo.get(key).add(ride);
     }
 
-    public double calculateFare(double distance, double time) {
-        double totalFare = distance * COST_PER_KM + time * COST_PER_MINUTE;
-        return Math.max(totalFare, MINIMUM_FARE);
+    public double calculateNormalFare(double distance, double time) {
+        double totalFare = distance * NORMAL_COST_PER_KM + time * NORMAL_COST_PER_MINUTE;
+        return Math.max(totalFare, NORMAL_MINIMUM_FARE);
+    }
+
+    public double calculatePremiumFare(double distance, double time) {
+        double totalFare = distance * PREMIUM_COST_PER_KM + time * PREMIUM_COST_PER_MINUTE;
+        return Math.max(totalFare, PREMIUM_MINIMUM_FARE);
     }
 
     public double aggregateFare(Ride[] rides) {
         double totalFare = 0.0;
         for (Ride ride : rides) {
-            totalFare += calculateFare(ride.distance, ride.time);
+            if (ride.type == "normal")
+                totalFare += calculateNormalFare(ride.distance, ride.time);
+            else
+                totalFare += calculatePremiumFare(ride.distance, ride.time);
         }
         return totalFare;
     }
@@ -40,7 +52,10 @@ public class CabInvoiceGenerator {
 
         double totalFare = 0.0;
         for (Ride ride : rides) {
-            totalFare += calculateFare(ride.distance, ride.time);
+            if (ride.type == "normal")
+                totalFare += calculateNormalFare(ride.distance, ride.time);
+            else
+                totalFare += calculatePremiumFare(ride.distance, ride.time);
         }
 
         return new InvoiceReport(totalRides, totalFare);
@@ -57,7 +72,10 @@ public class CabInvoiceGenerator {
 
         double totalFare = 0.0;
         for (Ride ride : rides) {
-            totalFare += calculateFare(ride.distance, ride.time);
+            if (ride.type == "normal")
+                totalFare += calculateNormalFare(ride.distance, ride.time);
+            else
+                totalFare += calculatePremiumFare(ride.distance, ride.time);
         }
 
         return new InvoiceReport(totalRides, totalFare);

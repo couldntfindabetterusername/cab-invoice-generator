@@ -17,28 +17,29 @@ public class TestCabInvoice {
 
     @Test
     public void testCalculateFare() {
-        double fare = cabInvoiceGenerator.calculateFare(5, 15);
+        double fare = cabInvoiceGenerator.calculateNormalFare(5, 15);
         assertEquals(65.0, fare);
     }
 
     @Test
     public void testMinimumFare() {
-        double fare = cabInvoiceGenerator.calculateFare(0.2, 2);
+        double fare = cabInvoiceGenerator.calculateNormalFare(0.2, 2);
         assertEquals(5.0, fare);
     }
 
     @Test
     public void testAggregateFare() {
-        double fare = cabInvoiceGenerator.aggregateFare(new Ride[] { new Ride(5, 15), new Ride(10, 30) });
+        double fare = cabInvoiceGenerator
+                .aggregateFare(new Ride[] { new Ride(5, 15, "normal"), new Ride(10, 30, "normal") });
         assertEquals(195.0, fare);
     }
 
     @Test
     public void testAverageFare() {
         Ride[] rides = {
-                new Ride(2.0, 5),
-                new Ride(1.0, 1),
-                new Ride(1.0, 2),
+                new Ride(2.0, 5, "normal"),
+                new Ride(1.0, 1, "normal"),
+                new Ride(1.0, 2, "normal"),
         };
 
         InvoiceReport report = cabInvoiceGenerator.getInvoiceReport(rides);
@@ -51,9 +52,9 @@ public class TestCabInvoice {
 
     @Test
     public void testInvoiceReportByUser() {
-        cabInvoiceGenerator.addRide("user1", new Ride(2.0, 5));
-        cabInvoiceGenerator.addRide("user1", new Ride(1.0, 1));
-        cabInvoiceGenerator.addRide("user2", new Ride(1.0, 2));
+        cabInvoiceGenerator.addRide("user1", new Ride(2.0, 5, "normal"));
+        cabInvoiceGenerator.addRide("user1", new Ride(1.0, 1, "normal"));
+        cabInvoiceGenerator.addRide("user2", new Ride(1.0, 2, "normal"));
 
         InvoiceReport user1Report = cabInvoiceGenerator.getInvoiceReport("user1");
         InvoiceReport user1ExpectedReport = new InvoiceReport(2, 36);
@@ -70,5 +71,19 @@ public class TestCabInvoice {
         assertEquals(user2ExpectedReport.ridesCount, user2Report.ridesCount);
         assertEquals(user2ExpectedReport.totalFare, user2Report.totalFare);
         assertEquals(user2ExpectedReport.averageFare, user2Report.averageFare);
+    }
+
+    @Test
+    public void testInvoiceReportForPremiumRides() {
+        cabInvoiceGenerator.addRide("user3", new Ride(2.0, 5, "premium"));
+        cabInvoiceGenerator.addRide("user3", new Ride(1.0, 1, "normal"));
+        cabInvoiceGenerator.addRide("user3", new Ride(1.0, 2, "premium"));
+
+        InvoiceReport user3Report = cabInvoiceGenerator.getInvoiceReport("user3");
+        InvoiceReport user3ExpectedReport = new InvoiceReport(3, 71);
+
+        assertEquals(user3ExpectedReport.ridesCount, user3Report.ridesCount);
+        assertEquals(user3ExpectedReport.totalFare, user3Report.totalFare);
+        assertEquals(user3ExpectedReport.averageFare, user3Report.averageFare);
     }
 }
